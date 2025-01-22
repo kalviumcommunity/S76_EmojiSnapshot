@@ -1,6 +1,6 @@
 # EmojiSnapshot
 
-**EmojiSnapshot** is a creative web application that allows users to capture moments using emojis. The project is designed to be a fun and interactive platform where users can create and share emoji-based snapshots, making mundane moments expressive and entertaining.
+**EmojiSnapshot** is a creative web application that analyzes users' chat history to showcase their most overused emojis. The project is designed to provide insights into emoji usage while creating a fun and interactive platform for users to explore and share their emoji trends.
 
 ---
 
