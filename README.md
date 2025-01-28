@@ -31,7 +31,6 @@
 ## Tech Stack
 
 - **Frontend:** React, Tailwind CSS
-- **Animations:** Framer Motion
 - **Backend:** Node.js, Express
 - **Database:** MongoDB
 - **Additional Tools:** Git, Postman, Figma
