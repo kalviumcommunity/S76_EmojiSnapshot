@@ -1,32 +1,25 @@
-const express = require('express');
+const express = require("express");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
+const connectDatabase = require("./database.js");
 
-// Middleware to parse JSON requests
-app.use(express.json());
+connectDatabase();
 
-// Ping endpoint
-app.get('/ping', (req, res) => {
-  try {
-    // Simulate a successful response
-    res.status(200).json({ message: 'pong' });
-  } catch (error) {
-    // Handle any unexpected errors
-    console.error('Error in /ping endpoint:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+app.get("/", function (req, res) {
+  res.send("Backend server is live!");
 });
 
-// Global error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+app.get("/ping", function (req, res) {
+  res.send("pong");
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-}).on('error', (err) => {
-  console.error('Server failed to start:', err.message);
-  process.exit(1); // Exit the process if the server fails to start
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, function () {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
