@@ -1,25 +1,41 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const connectDatabase = require("./database.js");
+const connectDatabase = require("./database");
 
-connectDatabase();
+connectDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  });
 
-app.get("/", function (req, res) {
-  res.send("Backend server is live!");
+app.get("/", async (req, res) => {
+  try {
+    const dbStatus =
+      mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
+    res.json({
+      message: "Welcome to ASAP API",
+      databaseStatus: dbStatus,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error checking database status",
+      error: error.message,
+    });
+  }
 });
 
 app.get("/ping", function (req, res) {
   res.send("pong");
 });
-
-if (process.env.NODE_ENV !== "test") {
-  app.listen(PORT, function () {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
 
 module.exports = app;

@@ -20,6 +20,7 @@ const connectDatabase = () => {
           console.log(
             `Database connection attempt failed. Retrying... (${retries} attempts left)`
           );
+          console.log(`Error details: ${err.message}`);
           // Wait 5 seconds before retrying
           return new Promise((resolve) => setTimeout(resolve, 5000)).then(() =>
             connectWithRetry(retries - 1)
