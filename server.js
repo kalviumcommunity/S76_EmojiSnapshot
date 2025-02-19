@@ -7,10 +7,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const connectDatabase = require("./database");
 
+const routes = require('./routes');
+app.use(express.json());
+app.use('/api', routes);
+
+
 connectDatabase()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server is running on port http://localhost:${PORT}`);
     });
   })
   .catch((error) => {
