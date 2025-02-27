@@ -33,6 +33,7 @@
 - **Frontend:** React, Tailwind CSS
 - **Backend:** Node.js, Express
 - **Database:** MongoDB
+- **Animation:** Framer motion
 - **Additional Tools:** Git, Postman, Figma
 
 ---
@@ -90,3 +91,4 @@ Contributions are welcome! To contribute:
 
 Happy snapping! 🎉
 
+deployed frontend link: https://emojisnapshot.pages.dev/

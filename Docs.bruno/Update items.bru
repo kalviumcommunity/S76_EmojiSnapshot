@@ -5,11 +5,15 @@ meta {
 }
 
 put {
-  url: http://localhost/api/items/:id
-  body: none
+  url: http://localhost:3000/api/items/1
+  body: json
   auth: none
 }
 
-params:path {
-  id: 
+body:json {
+  {
+    "price": 1100
+  }
+  
+  
 }
