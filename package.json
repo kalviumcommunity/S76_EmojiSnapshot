@@ -11,9 +11,11 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "@tailwindcss/vite": "^4.0.8",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongoose": "^8.10.0"
+    "mongoose": "^8.10.0",
+    "tailwindcss": "^4.0.8"
   },
   "devDependencies": {
     "jest": "^29.7.0",
