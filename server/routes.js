@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const snapshotRoutes = require("./routes/snapshots");
 
-router.use("/", snapshotRoutes);
-
+// In-memory storage
 let items = []; // Temporary in-memory storage
+let snapshots = []; // Temporary in-memory storage
+let nextId = 5; // Start IDs after sample data
 
 // Middleware to validate item ID
 const validateItemId = (req, res, next) => {
@@ -103,25 +103,52 @@ router.delete("/items/:id", validateItemId, (req, res) => {
   }
 });
 
-// Initial snapshots storage (will be replaced by MongoDB later)
-let snapshots = [];
+// Get all snapshots
+router.get("/snapshots", (req, res) => {
+  res.json(snapshots);
+});
 
-// POST endpoint to receive snapshots from frontend
+// Initialize with sample data
 router.post("/snapshots/init", (req, res) => {
   try {
     snapshots = req.body;
-    res.status(201).json({
-      message: "Snapshots initialized",
-      count: snapshots.length,
-    });
+    nextId = Math.max(...snapshots.map((s) => s.id)) + 1;
+    res
+      .status(201)
+      .json({ message: "Snapshots initialized", count: snapshots.length });
   } catch (error) {
     res.status(500).json({ message: "Error initializing snapshots" });
   }
 });
 
-// GET endpoint to retrieve snapshots
-router.get("/snapshots", (req, res) => {
-  res.json(snapshots);
+// Create a new snapshot
+router.post("/snapshots", (req, res) => {
+  try {
+    const newSnapshot = {
+      id: nextId++,
+      ...req.body,
+      createdAt: new Date(),
+    };
+    snapshots.unshift(newSnapshot); // Add to beginning of array
+    res.status(201).json(newSnapshot);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating snapshot" });
+  }
+});
+
+// Create a new snapshot with explicit path
+router.post("/snapshots/create", (req, res) => {
+  try {
+    const newSnapshot = {
+      id: nextId++,
+      ...req.body,
+      createdAt: new Date(),
+    };
+    snapshots.unshift(newSnapshot); // Add to beginning of array
+    res.status(201).json(newSnapshot);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating snapshot" });
+  }
 });
 
 module.exports = router;
