@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 // src/pages/Home.jsx
-// eslint-disable-next-line no-unused-vars
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom"; // Add useLocation
 import EmojiCard from "../components/EmojiCard";
 
 const sampleSnapshots = [
@@ -39,14 +40,72 @@ const sampleSnapshots = [
 ];
 
 const Home = () => {
+  const [snapshots, setSnapshots] = useState(sampleSnapshots);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation(); // Add this hook
+
+  useEffect(() => {
+    // Function to initialize backend
+    const initializeBackend = async () => {
+      try {
+        // Send sample data to server
+        await fetch("http://localhost:5000/api/snapshots/init", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(sampleSnapshots),
+        });
+      } catch (error) {
+        console.error("Error initializing backend:", error);
+      }
+    };
+
+    // Function to fetch snapshots
+    const fetchSnapshots = async () => {
+      try {
+        console.log("Fetching snapshots...");
+        const response = await fetch("http://localhost:5000/api/snapshots");
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched data:", data);
+          setSnapshots(data.length > 0 ? data : sampleSnapshots);
+        }
+      } catch (error) {
+        console.error("Error fetching snapshots:", error);
+        setSnapshots(sampleSnapshots); // Fallback to sample data
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Run both functions
+    initializeBackend().then(() => fetchSnapshots());
+  }, [location.key]); // Add location.key as dependency to refetch when location changes
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
+        <div className="text-2xl text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-yellow-50 py-20 px-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
-          Trending Emoji Snapshots
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800">
+            Trending Emoji Snapshots
+          </h1>
+          <Link to="/create">
+            <button className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none">
+              Create New
+            </button>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleSnapshots.map((snapshot) => (
+          {snapshots.map((snapshot) => (
             <EmojiCard key={snapshot.id} snapshot={snapshot} />
           ))}
         </div>
