@@ -1,0 +1,25 @@
+{
+  "name": "emoji_snapshot",
+  "version": "1.0.0",
+  "description": "**EmojiSnapshot** is a creative web application that analyzes users' chat history to showcase their most overused emojis. The project is designed to provide insights into emoji usage while creating a fun and interactive platform for users to explore and share their emoji trends.",
+  "main": "index.js",
+  "author": "vishal",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.8",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.10.0",
+    "tailwindcss": "^4.0.8"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
