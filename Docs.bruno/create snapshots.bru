@@ -1,0 +1,22 @@
+meta {
+  name: create snapshots
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:5000/api/snapshots/init
+  body: json
+  auth: none
+}
+
+body:json {
+   {
+          "id": 5,
+          "title": "Trip Vibes",
+          "emojis": ["🎊", "🧗", "❤️", "🎶", "🏄‍♀️"],
+          "createdAt": "2024-03-18T00:00:00.000Z",
+          "likes": 18,
+          "creator": { "name": "Jake" }
+  }
+}
