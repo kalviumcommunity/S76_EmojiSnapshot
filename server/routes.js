@@ -103,7 +103,7 @@ router.get("/snapshots", (req, res) => {
 });
 
 // Initialize with sample data
-router.post("/snapshots", (req, res) => {
+router.post("/snapshots/init", (req, res) => {
   try {
     snapshots = req.body;
     nextId = Math.max(...snapshots.map((s) => s.id)) + 1;
@@ -117,6 +117,21 @@ router.post("/snapshots", (req, res) => {
 
 // Create a new snapshot
 router.post("/snapshots", (req, res) => {
+  try {
+    const newSnapshot = {
+      id: nextId++,
+      ...req.body,
+      createdAt: new Date(),
+    };
+    snapshots.unshift(newSnapshot); // Add to beginning of array
+    res.status(201).json(newSnapshot);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating snapshot" });
+  }
+});
+
+// Create a new snapshot
+router.post("/snapshots/create", (req, res) => {
   try {
     const newSnapshot = {
       id: nextId++,
