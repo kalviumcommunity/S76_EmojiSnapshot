@@ -5,11 +5,19 @@ const cors = require("cors");
 dotenv.config();
 
 const app = express();
+<<<<<<< HEAD
 const PORT = process.env.PORT || 5000;
 const connectDatabase = require("./database");
 
 const routes = require('./routes');
 app.use(cors());  
+=======
+const PORT = process.env.PORT || 3000;
+const connectDatabase = require("./database");
+
+const routes = require('./routes');
+app.use(cors());
+>>>>>>> f4fc17e8b02d0029aac9231f4c3e8963d65c4b7a
 app.use(express.json());
 app.use('/api', routes);
 

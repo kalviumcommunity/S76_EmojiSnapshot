@@ -1,13 +1,29 @@
 const express = require("express");
 const router = express.Router();
+<<<<<<< HEAD
 
 let items = []; // Temporary in-memory storage
 let snapshots = []; // Temporary in-memory storage
 let nextId = 5; // Start IDs after sample data
+=======
+const snapshotRoutes = require("./routes/snapshots");
+
+router.use("/", snapshotRoutes);
+
+let items = []; // Temporary in-memory storage
+>>>>>>> f4fc17e8b02d0029aac9231f4c3e8963d65c4b7a
 
 // Middleware to validate item ID
 const validateItemId = (req, res, next) => {
   const id = parseInt(req.params.id);
+<<<<<<< HEAD
+=======
+  if (isNaN(id)) {
+    return res
+      .status(400)
+      .json({ message: "Invalid item ID. Must be a number." });
+  }
+>>>>>>> f4fc17e8b02d0029aac9231f4c3e8963d65c4b7a
   req.itemId = id; // Store the parsed ID for later use
   next();
 };
@@ -97,6 +113,7 @@ router.delete("/items/:id", validateItemId, (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // Get all snapshots
 router.get("/snapshots", (req, res) => {
   res.json(snapshots);
@@ -110,10 +127,24 @@ router.post("/snapshots/init", (req, res) => {
     res
       .status(201)
       .json({ message: "Snapshots initialized", count: snapshots.length });
+
+// Initial snapshots storage (will be replaced by MongoDB later)
+let snapshots = [];
+
+// POST endpoint to receive snapshots from frontend
+router.post("/snapshots/init", (req, res) => {
+  try {
+    snapshots = req.body;
+    res.status(201).json({
+      message: "Snapshots initialized",
+      count: snapshots.length,
+    });
+
   } catch (error) {
     res.status(500).json({ message: "Error initializing snapshots" });
   }
 });
+
 
 // Create a new snapshot
 router.post("/snapshots", (req, res) => {
@@ -143,6 +174,11 @@ router.post("/snapshots/create", (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error creating snapshot" });
   }
+
+// GET endpoint to retrieve snapshots
+router.get("/snapshots", (req, res) => {
+  res.json(snapshots);
+
 });
 
 module.exports = router;
