@@ -48,14 +48,22 @@ const Home = () => {
     // Function to initialize backend
     const initializeBackend = async () => {
       try {
-        // Send sample data to server
-        await fetch("http://localhost:5000/api/snapshots/init", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(sampleSnapshots),
-        });
+        // First check if there are any snapshots
+        const checkResponse = await fetch(
+          "http://localhost:5000/api/snapshots"
+        );
+        const existingSnapshots = await checkResponse.json();
+
+        // Only initialize if there are no snapshots
+        if (existingSnapshots.length === 0) {
+          await fetch("http://localhost:5000/api/snapshots/init", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sampleSnapshots),
+          });
+        }
       } catch (error) {
         console.error("Error initializing backend:", error);
       }
@@ -83,6 +91,11 @@ const Home = () => {
     initializeBackend().then(() => fetchSnapshots());
   }, [location.key]); // Add location.key as dependency to refetch when location changes
 
+  const handleDelete = (id) => {
+    // Update state to remove deleted snapshot
+    setSnapshots(snapshots.filter((snapshot) => snapshot.id !== id));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
@@ -106,7 +119,11 @@ const Home = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {snapshots.map((snapshot) => (
-            <EmojiCard key={snapshot.id} snapshot={snapshot} />
+            <EmojiCard
+              key={snapshot.id}
+              snapshot={snapshot}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       </div>
