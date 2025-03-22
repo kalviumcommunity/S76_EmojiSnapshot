@@ -137,17 +137,57 @@ router.post("/snapshots", (req, res) => {
 });
 
 // Create a new snapshot with explicit path
-router.post("/snapshots/create", (req, res) => {
+// router.post("/snapshots/create", (req, res) => {
+//   try {
+//     const newSnapshot = {
+//       id: nextId++,
+//       ...req.body,
+//       createdAt: new Date(),
+//     };
+//     snapshots.unshift(newSnapshot); // Add to beginning of array
+//     res.status(201).json(newSnapshot);
+//   } catch (error) {
+//     res.status(500).json({ message: "Error creating snapshot" });
+//   }
+// });
+
+// Update an existing snapshot
+router.put("/snapshots/:id", (req, res) => {
   try {
-    const newSnapshot = {
-      id: nextId++,
+    const id = parseInt(req.params.id);
+    const index = snapshots.findIndex((s) => s.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Snapshot not found" });
+    }
+
+    // Preserve the id and update the rest
+    snapshots[index] = {
+      ...snapshots[index],
       ...req.body,
-      createdAt: new Date(),
+      id: snapshots[index].id, // Ensure ID doesn't change
     };
-    snapshots.unshift(newSnapshot); // Add to beginning of array
-    res.status(201).json(newSnapshot);
+
+    res.json({ message: "Snapshot updated", snapshot: snapshots[index] });
   } catch (error) {
-    res.status(500).json({ message: "Error creating snapshot" });
+    res.status(500).json({ message: "Error updating snapshot" });
+  }
+});
+
+// Delete a snapshot
+router.delete("/snapshots/:id", (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const index = snapshots.findIndex((s) => s.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Snapshot not found" });
+    }
+
+    const deleted = snapshots.splice(index, 1)[0];
+    res.json({ message: "Snapshot deleted", snapshot: deleted });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting snapshot" });
   }
 });
 
