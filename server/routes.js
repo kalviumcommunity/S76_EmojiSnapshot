@@ -111,19 +111,77 @@ router.get("/snapshots", (req, res) => {
 // Initialize with sample data
 router.post("/snapshots/init", (req, res) => {
   try {
+    // Validate that request body is an array
+    if (!Array.isArray(req.body) || req.body.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Request body must be a non-empty array of snapshots" });
+    }
+
+    // Validate each snapshot in the array
+    for (const snapshot of req.body) {
+      if (!snapshot.title || typeof snapshot.title !== "string") {
+        return res.status(400).json({ 
+          message: "Each snapshot must have a title property that is a string"
+        });
+      }
+      
+      if (!Array.isArray(snapshot.emojis) || snapshot.emojis.length === 0) {
+        return res.status(400).json({ 
+          message: "Each snapshot must have an emojis property that is a non-empty array"
+        });
+      }
+      
+      if (!snapshot.creator || !snapshot.creator.name) {
+        return res.status(400).json({ 
+          message: "Each snapshot must have a creator with a name property"
+        });
+      }
+    }
+    
     snapshots = req.body;
     nextId = Math.max(...snapshots.map((s) => s.id)) + 1;
     res
       .status(201)
       .json({ message: "Snapshots initialized", count: snapshots.length });
   } catch (error) {
-    res.status(500).json({ message: "Error initializing snapshots" });
+    res.status(500).json({ message: "Error initializing snapshots", error: error.message });
   }
 });
 
 // Create a new snapshot
 router.post("/snapshots", (req, res) => {
   try {
+    // Validate request body
+    const { title, emojis, creator } = req.body;
+
+    // Check required fields
+    if (!title || typeof title !== "string" || title.trim() === "") {
+      return res
+        .status(400)
+        .json({ message: "Title is required and must be a non-empty string" });
+    }
+
+    // Validate emojis array
+    if (!Array.isArray(emojis) || emojis.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Emojis must be an array with at least one emoji" });
+    }
+
+    // Validate creator
+    if (
+      !creator ||
+      typeof creator !== "object" ||
+      !creator.name ||
+      typeof creator.name !== "string"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Creator must be an object with a name property" });
+    }
+
+    // If validation passed, create the new snapshot
     const newSnapshot = {
       id: nextId++,
       ...req.body,
@@ -132,26 +190,12 @@ router.post("/snapshots", (req, res) => {
     snapshots.unshift(newSnapshot); // Add to beginning of array
     res.status(201).json(newSnapshot);
   } catch (error) {
-    res.status(500).json({ message: "Error creating snapshot" });
+    res.status(500).json({ message: "Error creating snapshot", error: error.message });
   }
 });
 
-// Create a new snapshot with explicit path
-// router.post("/snapshots/create", (req, res) => {
-//   try {
-//     const newSnapshot = {
-//       id: nextId++,
-//       ...req.body,
-//       createdAt: new Date(),
-//     };
-//     snapshots.unshift(newSnapshot); // Add to beginning of array
-//     res.status(201).json(newSnapshot);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error creating snapshot" });
-//   }
-// });
 
-// Update an existing snapshot
+// Update an existing snapshot with validation
 router.put("/snapshots/:id", (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -161,16 +205,48 @@ router.put("/snapshots/:id", (req, res) => {
       return res.status(404).json({ message: "Snapshot not found" });
     }
 
-    // Preserve the id and update the rest
+    // Validate request body
+    const { title, emojis, creator } = req.body;
+
+    // Check required fields
+    if (!title || typeof title !== "string" || title.trim() === "") {
+      return res
+        .status(400)
+        .json({ message: "Title is required and must be a non-empty string" });
+    }
+
+    // Validate emojis array
+    if (!Array.isArray(emojis) || emojis.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Emojis must be an array with at least one emoji" });
+    }
+
+    // Validate creator
+    if (
+      !creator ||
+      typeof creator !== "object" ||
+      !creator.name ||
+      typeof creator.name !== "string"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Creator must be an object with a name property" });
+    }
+
+    // Preserve the id and createdAt, update everything else
     snapshots[index] = {
       ...snapshots[index],
       ...req.body,
       id: snapshots[index].id, // Ensure ID doesn't change
+      createdAt: snapshots[index].createdAt, // Keep original creation date
     };
 
     res.json({ message: "Snapshot updated", snapshot: snapshots[index] });
   } catch (error) {
-    res.status(500).json({ message: "Error updating snapshot" });
+    res
+      .status(500)
+      .json({ message: "Error updating snapshot", error: error.message });
   }
 });
 
