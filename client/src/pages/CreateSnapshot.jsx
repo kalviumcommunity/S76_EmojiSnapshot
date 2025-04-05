@@ -48,7 +48,11 @@ const CreateSnapshot = () => {
         emojis: filteredEmojis,
         createdAt: new Date(),
         likes: 0,
-        creator: { name: formData.creatorName },
+        creator: {
+          name: formData.creatorName,
+          id: formData.creatorName.toLowerCase().replace(/\s+/g, "-"),
+        },
+        created_by: formData.creatorName.toLowerCase().replace(/\s+/g, "-"),
       };
 
       const response = await fetch("http://localhost:5000/api/snapshots", {

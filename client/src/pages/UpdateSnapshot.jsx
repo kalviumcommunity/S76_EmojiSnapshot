@@ -78,7 +78,11 @@ const UpdateSnapshot = () => {
       const snapshotData = {
         title: formData.title,
         emojis: filteredEmojis,
-        creator: { name: formData.creatorName },
+        creator: {
+          name: formData.creatorName,
+          id: formData.creatorName.toLowerCase().replace(/\s+/g, "-"),
+        },
+        created_by: formData.creatorName.toLowerCase().replace(/\s+/g, "-"),
       };
 
       const response = await fetch(
