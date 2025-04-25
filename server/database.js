@@ -1,40 +1,29 @@
-const mongoose = require("mongoose");
+const mysql = require("mysql2/promise");
+require("dotenv").config();
 
-const connectDatabase = () => {
-  // Validate environment variable
-  if (!process.env.DB_URL) {
-    console.error("Database Error: DB_URL environment variable is not defined");
+// Create a pool of connections
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+const connectDatabase = async () => {
+  try {
+    // Test the connection
+    const connection = await pool.getConnection();
+    console.log(`MySQL connected successfully to ${process.env.DB_HOST}`);
+    connection.release();
+    return pool;
+  } catch (error) {
+    console.error("MySQL connection error:", error);
     process.exit(1);
   }
-
-  const connectWithRetry = (retries = 3) => {
-    return mongoose
-      .connect(process.env.DB_URL)
-      .then((data) => {
-        console.log(
-          `MongoDB connected successfully with server: ${data.connection.host}`
-        );
-      })
-      .catch((err) => {
-        if (retries > 0) {
-          console.log(
-            `Database connection attempt failed. Retrying... (${retries} attempts left)`
-          );
-          console.log(`Error details: ${err.message}`);
-          // Wait 5 seconds before retrying
-          return new Promise((resolve) => setTimeout(resolve, 5000)).then(() =>
-            connectWithRetry(retries - 1)
-          );
-        }
-
-        console.error("Database connection failed permanently:");
-        console.error(`Error type: ${err.name}`);
-        console.error(`Error message: ${err.message}`);
-        process.exit(1);
-      });
-  };
-
-  return connectWithRetry();
 };
 
-module.exports = connectDatabase;
+module.exports = { connectDatabase, pool };
