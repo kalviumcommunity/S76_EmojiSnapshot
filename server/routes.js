@@ -115,37 +115,42 @@ router.post("/snapshots/init", (req, res) => {
     if (!Array.isArray(req.body) || req.body.length === 0) {
       return res
         .status(400)
-        .json({ message: "Request body must be a non-empty array of snapshots" });
+        .json({
+          message: "Request body must be a non-empty array of snapshots",
+        });
     }
 
     // Validate each snapshot in the array
     for (const snapshot of req.body) {
       if (!snapshot.title || typeof snapshot.title !== "string") {
-        return res.status(400).json({ 
-          message: "Each snapshot must have a title property that is a string"
+        return res.status(400).json({
+          message: "Each snapshot must have a title property that is a string",
         });
       }
-      
+
       if (!Array.isArray(snapshot.emojis) || snapshot.emojis.length === 0) {
-        return res.status(400).json({ 
-          message: "Each snapshot must have an emojis property that is a non-empty array"
+        return res.status(400).json({
+          message:
+            "Each snapshot must have an emojis property that is a non-empty array",
         });
       }
-      
+
       if (!snapshot.creator || !snapshot.creator.name) {
-        return res.status(400).json({ 
-          message: "Each snapshot must have a creator with a name property"
+        return res.status(400).json({
+          message: "Each snapshot must have a creator with a name property",
         });
       }
     }
-    
+
     snapshots = req.body;
     nextId = Math.max(...snapshots.map((s) => s.id)) + 1;
     res
       .status(201)
       .json({ message: "Snapshots initialized", count: snapshots.length });
   } catch (error) {
-    res.status(500).json({ message: "Error initializing snapshots", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error initializing snapshots", error: error.message });
   }
 });
 
@@ -181,19 +186,26 @@ router.post("/snapshots", (req, res) => {
         .json({ message: "Creator must be an object with a name property" });
     }
 
+    // Ensure creator has an ID
+    if (!creator.id) {
+      creator.id = creator.name.toLowerCase().replace(/\s+/g, "-");
+    }
+
     // If validation passed, create the new snapshot
     const newSnapshot = {
       id: nextId++,
       ...req.body,
+      created_by: creator.id, // Add the created_by property
       createdAt: new Date(),
     };
     snapshots.unshift(newSnapshot); // Add to beginning of array
     res.status(201).json(newSnapshot);
   } catch (error) {
-    res.status(500).json({ message: "Error creating snapshot", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating snapshot", error: error.message });
   }
 });
-
 
 // Update an existing snapshot with validation
 router.put("/snapshots/:id", (req, res) => {

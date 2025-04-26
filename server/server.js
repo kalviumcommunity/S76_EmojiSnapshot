@@ -1,18 +1,19 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const mongoose = require("mongoose");
 const cors = require("cors");
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const connectDatabase = require("./database");
+const { connectDatabase } = require("./database");
 
-const routes = require('./routes');
+const snapshotRoutes = require("./routes/snapshots");
+const routes = require("./routes"); // Keep this for backward compatibility
+
 app.use(cors());
 app.use(express.json());
-app.use('/api', routes);
-
+app.use("/api", snapshotRoutes);
+app.use("/api", routes); // Keep this for backward compatibility
 
 connectDatabase()
   .then(() => {
@@ -27,11 +28,9 @@ connectDatabase()
 
 app.get("/", async (req, res) => {
   try {
-    const dbStatus =
-      mongoose.connection.readyState === 1 ? "Connected" : "Disconnected";
     res.json({
-      message: "Welcome to ASAP API",
-      databaseStatus: dbStatus,
+      message: "Welcome to Emoji Snapshot API",
+      databaseStatus: "Connected to MySQL",
     });
   } catch (error) {
     res.status(500).json({

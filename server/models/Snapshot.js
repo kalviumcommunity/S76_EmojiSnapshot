@@ -24,6 +24,15 @@ const snapshotSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    id: {
+      type: String,
+      required: true,
+    },
+  },
+  // Adding created_by for explicit tracking (points to creator.id)
+  created_by: {
+    type: String,
+    required: true,
   },
 });
 
